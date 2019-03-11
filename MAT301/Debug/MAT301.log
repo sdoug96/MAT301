@@ -1,1 +1,11 @@
-﻿  MAT301.vcxproj -> C:\Users\User\Documents\MAT301\Debug\MAT301.exe
+﻿  Game.cpp
+c:\users\scott\documents\mat301\mat301\game.cpp(12): warning C4244: 'argument': conversion from 'T' to 'T', possible loss of data
+          with
+          [
+              T=unsigned int
+          ]
+          and
+          [
+              T=float
+          ]
+  MAT301.vcxproj -> C:\Users\scott\Documents\MAT301\Debug\MAT301.exe

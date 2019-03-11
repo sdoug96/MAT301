@@ -1,10 +1,20 @@
 #include "pch.h"
 #include "Game.h"
+#include "Input.h"
 
 void main(int argc, char** argv[])
 {
-	sf::RenderWindow window(sf::VideoMode(800, 600), "Lab 1");
-	Game game(&window);
+	sf::RenderWindow window(sf::VideoMode(800, 600), "AI Response System");
+
+	//Declare game objects
+	Input input;
+
+	Game game(&window, &input);
+
+	//For delta time calculation
+	sf::Clock clock;
+	float deltaTime;
+
 	while (window.isOpen())
 	{
 		sf::Event event;
@@ -19,13 +29,31 @@ void main(int argc, char** argv[])
 				window.setView(sf::View(sf::FloatRect(0, 0,
 					event.size.width, event.size.height)));
 				break;
+			case sf::Event::KeyPressed:
+				input.setKeyDown(event.key.code);
+				break;
+			case sf::Event::KeyReleased:
+				input.setKeyUp(event.key.code);
+				break;
+			case sf::Event::MouseMoved:
+				input.setMousePosition(event.mouseMove.x, event.mouseMove.y);
+				break;
 			default:
 				// don't handle other events
 				break;
 			}
 		}
-		game.handleInput();
-		game.update();
+
+		//Calculate delta time
+		deltaTime = clock.restart().asSeconds();
+
+		game.handleInput(deltaTime);
+		game.update(deltaTime);
 		game.render();
+
+		if (input.isKeyDown(sf::Keyboard::Escape))
+		{
+			window.close();
+		}
 	}
 }
