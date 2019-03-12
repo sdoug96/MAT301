@@ -4,7 +4,7 @@
 
 void main(int argc, char** argv[])
 {
-	sf::RenderWindow window(sf::VideoMode(800, 600), "AI Response System");
+	sf::RenderWindow window(sf::VideoMode(1920, 1080), "AI Response System");
 
 	//Declare game objects
 	Input input;
