@@ -5,16 +5,18 @@
 void main(int argc, char** argv[])
 {
 	sf::RenderWindow window(sf::VideoMode(1920, 1080), "AI Response System");
+	sf::RenderWindow objectivesWindow(sf::VideoMode(800, 600), "Objectives");
 
 	//Declare game objects
 	Input input;
 
-	Game game(&window, &input);
+	Game game(&window, &objectivesWindow, &input);
 
 	//For delta time calculation
 	sf::Clock clock;
 	float deltaTime;
 
+	//Window events (no input on objectives window)
 	while (window.isOpen())
 	{
 		sf::Event event;
@@ -54,6 +56,7 @@ void main(int argc, char** argv[])
 		if (input.isKeyDown(sf::Keyboard::Escape))
 		{
 			window.close();
+			objectivesWindow.close();
 		}
 	}
 }

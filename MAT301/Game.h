@@ -12,7 +12,7 @@ class Game
 
 public:
 
-	Game(sf::RenderWindow* hwnd, Input* in);
+	Game(sf::RenderWindow* hwnd, sf::RenderWindow* objhwnd, Input* in);
 	~Game();
 
 	void update(float dt);
@@ -22,8 +22,11 @@ public:
 private:
 
 	sf::RenderWindow* window; //Window pointer
+	sf::RenderWindow* objectivesWindow; //Objectives window pointer
+
 	Input* input; //Input pointer
 
+	//Bartender emotional states
 	enum States
 	{
 		NEUTRAL,
@@ -31,17 +34,24 @@ private:
 		SAD,
 		ANGRY,
 		EXCITED,
-		VERYHAPPY,
-		VERYSAD,
-		VERYANGRY,
-		VERYEXCITED
 	};
 
+	//Bartender emotional state
 	States state;
 
+	//Initialise main game objects
+	void initBackAndFace();
+	void initMeters();
+	void initLogosAndButtons();
+	void initText();
+
+	//Update main game objects
 	void handleMeters();
 	void setState();
 	void handleStates();
+
+	//Update main game text options
+	void updateAIOptions();
 
 	void updateHappyOptions();
 	void updateSadOptions();
@@ -51,9 +61,10 @@ private:
 	void beginDraw();
 	void endDraw();
 
-	int happyMeter = 0, sadMeter = 0, angryMeter = 0, excitedMeter = 0;
+	int happyMeter = 0, sadMeter = 0, angryMeter = 0, excitedMeter = 0; //Bartender emotion meters
 
 	GameObject background; //Background image game object
+	GameObject body; //Body game object
 	GameObject face; //Face game object
 	GameObject AITextBox; //AIs text box game object
 	GameObject optionButton1, optionButton2, optionButton3, optionButton4; //Option button game objects
@@ -66,6 +77,7 @@ private:
 	bool hasStarted;
 
 	sf::Texture backTex; //Background image texture
+	sf::Texture bodyTexture; //Body texture
 	sf::Texture neutralFaceTex; //Neutral expression texture
 	sf::Texture happyFaceTex; //Happy expression texture
 	sf::Texture sadFaceTex; //Happy expression texture
@@ -85,5 +97,15 @@ private:
 	sf::RectangleShape happyMeterRec, sadMeterRec, angryMeterRec, excitedMeterRec; //Meter game objects
 
 	sf::CircleShape happyLogo, sadLogo, angryLogo, excitedLogo; //Indicator game objects
+
+
+	////////////////Objectives Window Stuff////////////////////////////////
+
+	sf::Text objTitle; //Objective window title
+
+	sf::Text obj1, obj2, obj3, obj4; //Objective window objectives text
+
+	GameObject checkbox1, checkbox2, checkbox3, checkbox4; //Objective window checkboxes
+	GameObject tick1, tick2, tick3, tick4; //Objective window ticks
 };
 

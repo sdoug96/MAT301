@@ -2,37 +2,188 @@
 
 #include "pch.h"
 #include "Game.h"
+#include <iostream>
 
-Game::Game(sf::RenderWindow* hwnd, Input* in)
+using namespace std;
+
+Game::Game(sf::RenderWindow* hwnd, sf::RenderWindow* objhwnd, Input* in)
 {
 	window = hwnd;
+	objectivesWindow = objhwnd;
 	input = in;
-
-	state = States::NEUTRAL;
 
 	if (!defaultFont.loadFromFile("font/interbureau.ttf"))
 	{
 		//something went wrong
 	}
 
+	initBackAndFace();
+
+	initMeters();
+
+	initLogosAndButtons();
+
+	initText();
+
+	audioMgr.addMusic("sfx/BarNoise.wav", "barNoise");
+}
+
+Game::~Game()
+{
+}
+
+void Game::update(float dt)
+{
+	//Play game music
+	if (!hasStarted)
+	{
+		audioMgr.playMusicbyName("barNoise");
+		hasStarted = true;
+	}
+
+	updateAIOptions(); //Update AI text
+
+	updateHappyOptions(); //Update happy option text
+	updateSadOptions(); //Update sad option text
+	updateAngryOptions(); //Update angry option text
+	updateExcitedOptions(); //Update excited option text
+
+	handleMeters(); //Update meter values
+
+	setState(); //Set states
+
+	handleStates(); //Handle states
+}
+
+void Game::handleInput(float dt)
+{
+	//Option 1 (happy option) is chosen
+	if (input->isKeyDown(sf::Keyboard::Num1))
+	{
+		input->setKeyUp(sf::Keyboard::Num1); //Set key up so it isnt held down
+		happyClickCount += 1; //Increase happy click count by 1
+		happyMeter += 10; //Increase happy meter value by 10
+		input->setMouseX(optionButton1.getPosition().x - 1); //Move mouse so doesnt stay held on button
+		input->setMouseY(optionButton1.getPosition().y - 1); //Move mouse so doesnt stay held on button
+		lastClick = 1; //Set last click to 1 to remember happy option
+	}
+
+	//Option 2 (sad option) is chosen
+	if (input->isKeyDown(sf::Keyboard::Num2))
+	{
+		input->setKeyUp(sf::Keyboard::Num2); //Set key up so it isnt held down
+		sadMeter += 10; //Increase sad click count by 1
+		sadClickCount += 1; //Increase sad meter value by 10
+		input->setMouseX(optionButton2.getPosition().x - 1); //Move mouse so doesnt stay held on button
+		input->setMouseY(optionButton2.getPosition().y - 1); //Move mouse so doesnt stay held on button
+		lastClick = 2; //Set last click to 2 to remember sad option
+	}
+
+	//Option 3 (angry option) is chosen
+	if (input->isKeyDown(sf::Keyboard::Num3))
+	{
+		input->setKeyUp(sf::Keyboard::Num3); //Set key up so it isnt held down
+		angryMeter += 10; //Increase angry click count by 1
+		angryClickCount += 1; //Increase angry meter value by 10
+		input->setMouseX(optionButton3.getPosition().x - 1); //Move mouse so doesnt stay held on button
+		input->setMouseY(optionButton3.getPosition().y - 1); //Move mouse so doesnt stay held on button
+		lastClick = 3; //Set last click to 3 to remember angry option
+	}
+
+	//Option 4 (excited option) is chosen
+	if (input->isKeyDown(sf::Keyboard::Num4))
+	{
+		input->setKeyUp(sf::Keyboard::Num4); //Set key up so it isnt held down
+		excitedMeter += 10; //Increase excited click count by 1
+		excitedClickCount += 1; //Increase excited meter value by 10
+		input->setMouseX(optionButton4.getPosition().x - 1); //Move mouse so doesnt stay held on button
+		input->setMouseY(optionButton4.getPosition().y - 1); //Move mouse so doesnt stay held on button
+		lastClick = 4; //Set last click to 4 to remember excited option
+	}
+}
+
+void Game::render()
+{
+	beginDraw();
+
+	///////Game Window//////////
+
+	//Draw background and faces
+	window->draw(background);
+	window->draw(body);
+	window->draw(face);
+
+	//Draw meter outlines
+	window->draw(happyMeterBack);
+	window->draw(sadMeterBack);
+	window->draw(angryMeterBack);
+	window->draw(excitedMeterBack);
+
+	//Draw meters
+	window->draw(happyMeterRec);
+	window->draw(sadMeterRec);
+	window->draw(angryMeterRec);
+	window->draw(excitedMeterRec);
+
+	//Draw text option indicators
+	window->draw(happyLogo);
+	window->draw(sadLogo);
+	window->draw(angryLogo);
+	window->draw(excitedLogo);
+
+	//Draw text boxes
+	window->draw(AITextBox);
+	window->draw(optionButton1);
+	window->draw(optionButton2);
+	window->draw(optionButton3);
+	window->draw(optionButton4);
+
+	//Draw text
+	window->draw(AIText);
+	window->draw(textOption1);
+	window->draw(textOption2);
+	window->draw(textOption3);
+	window->draw(textOption4);
+	window->draw(AIMoodText1);
+	window->draw(AIMoodText2);
+
+	////////Objectives Window/////////
+
+	objectivesWindow->draw(objTitle);
+
+	endDraw();
+}
+
+void Game::initBackAndFace()
+{
+	state = States::NEUTRAL;
+
 	backTex.loadFromFile("gfx/Background.png");
 	background.setSize(sf::Vector2f(window->getSize().x, window->getSize().y));
 	background.setTexture(&backTex);
 	background.setPosition(0, 0);
 
+	bodyTexture.loadFromFile("gfx/Bartender.png");
+	body.setSize(sf::Vector2f(350, 400));
+	body.setTexture(&bodyTexture);
+	body.setPosition(158, 263);
+
 	neutralFaceTex.loadFromFile("gfx/Neutral.png");
-	face.setSize(sf::Vector2f(400, 400));
+	face.setSize(sf::Vector2f(200, 200));
 	face.setTexture(&neutralFaceTex);
-	face.setPosition(50, 100);
+	face.setPosition(245, 240);
 
 	happyFaceTex.loadFromFile("gfx/Happy.png");
 	sadFaceTex.loadFromFile("gfx/Sad.png");
 	angryFaceTex.loadFromFile("gfx/Angry.png");
 	excitedFaceTex.loadFromFile("gfx/Excited.png");
+}
 
+void Game::initMeters()
+{
 	happyMeterRec.setFillColor(sf::Color::Green);
 	happyMeterRec.setPosition(1375, 20);
-	
+
 	sadMeterRec.setFillColor(sf::Color::Blue);
 	sadMeterRec.setPosition(1475, 20);
 
@@ -57,7 +208,10 @@ Game::Game(sf::RenderWindow* hwnd, Input* in)
 	excitedMeterBack.setSize(sf::Vector2f(40, 70));
 	excitedMeterBack.setFillColor(sf::Color::Black);
 	excitedMeterBack.setPosition(excitedMeterRec.getPosition().x - 10, 10);
+}
 
+void Game::initLogosAndButtons()
+{
 	happyLogo.setRadius(20);
 	happyLogo.setFillColor(sf::Color::Green);
 	happyLogo.setPosition(1190, 263);
@@ -95,7 +249,10 @@ Game::Game(sf::RenderWindow* hwnd, Input* in)
 	optionButton4.setSize(sf::Vector2f(600, 75));
 	optionButton4.setTexture(&textBoxTex);
 	optionButton4.setPosition(1250, 520);
+}
 
+void Game::initText()
+{
 	AIText.setString("Hi, I am the bartender, would you like a drink?");
 	AIText.setFont(defaultFont);
 	AIText.setCharacterSize(40);
@@ -138,120 +295,11 @@ Game::Game(sf::RenderWindow* hwnd, Input* in)
 	AIMoodText2.setFillColor(sf::Color::Black);
 	AIMoodText2.setPosition(375, 23);
 
-	audioMgr.addMusic("sfx/BarNoise.wav", "barNoise");
-}
-
-Game::~Game()
-{
-}
-
-void Game::update(float dt)
-{
-	//Play game music
-	if (!hasStarted)
-	{
-		audioMgr.playMusicbyName("barNoise");
-		hasStarted = true;
-	}
-
-	updateHappyOptions(); //Update happy option text
-	updateSadOptions(); //Update sad option text
-	updateAngryOptions(); //Update angry option text
-	updateExcitedOptions(); //Update excited option text
-
-	handleMeters(); //Update meter values
-
-	setState(); //Set states
-
-	handleStates(); //Handle states
-}
-
-void Game::handleInput(float dt)
-{
-	//Option 1 (happy option) is chosen
-	if (optionButton1.getGlobalBounds().contains(input->getMouseX(), input->getMouseY()) &&
-		sf::Mouse::isButtonPressed(sf::Mouse::Left))
-	{
-		happyClickCount += 1; //Increase happy click count by 1
-		happyMeter += 10; //Increase happy meter value by 10
-		input->setMouseX(optionButton1.getPosition().x - 1); //Move mouse so doesnt stay held on button
-		input->setMouseY(optionButton1.getPosition().y - 1); //Move mouse so doesnt stay held on button
-	}
-
-	//Option 2 (sad option) is chosen
-	if (optionButton2.getGlobalBounds().contains(input->getMouseX(), input->getMouseY()) &&
-		sf::Mouse::isButtonPressed(sf::Mouse::Left))
-	{
-		sadMeter += 10; //Increase sad click count by 1
-		sadClickCount += 1; //Increase sad meter value by 10
-		input->setMouseX(optionButton2.getPosition().x - 1); //Move mouse so doesnt stay held on button
-		input->setMouseY(optionButton2.getPosition().y - 1); //Move mouse so doesnt stay held on button
-	}
-
-	//Option 3 (angry option) is chosen
-	if (optionButton3.getGlobalBounds().contains(input->getMouseX(), input->getMouseY()) &&
-		sf::Mouse::isButtonPressed(sf::Mouse::Left))
-	{
-		angryMeter += 10; //Increase angry click count by 1
-		angryClickCount += 1; //Increase angry meter value by 10
-		input->setMouseX(optionButton3.getPosition().x - 1); //Move mouse so doesnt stay held on button
-		input->setMouseY(optionButton3.getPosition().y - 1); //Move mouse so doesnt stay held on button
-	}
-
-	//Option 4 (excited option) is chosen
-	if (optionButton4.getGlobalBounds().contains(input->getMouseX(), input->getMouseY()) &&
-		sf::Mouse::isButtonPressed(sf::Mouse::Left))
-	{
-		excitedMeter += 10; //Increase excited click count by 1
-		excitedClickCount += 1; //Increase excited meter value by 10
-		input->setMouseX(optionButton4.getPosition().x - 1); //Move mouse so doesnt stay held on button
-		input->setMouseY(optionButton4.getPosition().y - 1); //Move mouse so doesnt stay held on button
-	}
-}
-
-void Game::render()
-{
-	beginDraw();
-
-	//Draw background and faces
-	window->draw(background);
-	window->draw(face);
-
-	//Draw meter outlines
-	window->draw(happyMeterBack);
-	window->draw(sadMeterBack);
-	window->draw(angryMeterBack);
-	window->draw(excitedMeterBack);
-
-	//Draw meters
-	window->draw(happyMeterRec);
-	window->draw(sadMeterRec);
-	window->draw(angryMeterRec);
-	window->draw(excitedMeterRec);
-
-	//Draw text option indicators
-	window->draw(happyLogo);
-	window->draw(sadLogo);
-	window->draw(angryLogo);
-	window->draw(excitedLogo);
-
-	//Draw text boxes
-	window->draw(AITextBox);
-	window->draw(optionButton1);
-	window->draw(optionButton2);
-	window->draw(optionButton3);
-	window->draw(optionButton4);
-
-	//Draw text
-	window->draw(AIText);
-	window->draw(textOption1);
-	window->draw(textOption2);
-	window->draw(textOption3);
-	window->draw(textOption4);
-	window->draw(AIMoodText1);
-	window->draw(AIMoodText2);
-
-	endDraw();
+	objTitle.setString("Objectives");
+	objTitle.setFont(defaultFont);
+	objTitle.setCharacterSize(75);
+	objTitle.setFillColor(sf::Color::Black);
+	objTitle.setPosition(250, -20);
 }
 
 void Game::handleMeters()
@@ -274,6 +322,7 @@ void Game::handleMeters()
 		sadClickCount = 0;
 		angryClickCount = 0;
 		excitedClickCount = 0;
+		lastClick = 0;
 	}
 }
 
@@ -306,14 +355,17 @@ void Game::setState()
 
 void Game::handleStates()
 {
+	//Set values for neutral state
 	if (state == States::NEUTRAL)
 	{
 		AIMoodText1.setFillColor(sf::Color::Black);
 		AIMoodText2.setFillColor(sf::Color::Black);
 		AIMoodText2.setString("Neutral");
 		face.setTexture(&neutralFaceTex);
+		AIText.setString("Hi, I am the bartender, would you like a drink?");
 	}
 
+	//Set values for happy state
 	if (state == States::HAPPY)
 	{
 		AIMoodText1.setFillColor(sf::Color::Green);
@@ -322,6 +374,7 @@ void Game::handleStates()
 		face.setTexture(&happyFaceTex);
 	}
 
+	//Set values for sad state
 	if (state == States::SAD)
 	{
 		AIMoodText1.setFillColor(sf::Color::Blue);
@@ -330,6 +383,7 @@ void Game::handleStates()
 		face.setTexture(&sadFaceTex);
 	}
 
+	//Set values for angry state
 	if (state == States::ANGRY)
 	{
 		AIMoodText1.setFillColor(sf::Color::Red);
@@ -338,6 +392,7 @@ void Game::handleStates()
 		face.setTexture(&angryFaceTex);
 	}
 
+	//Set values for excited state
 	if (state == States::EXCITED)
 	{
 		AIMoodText1.setFillColor(sf::Color::Yellow);
@@ -347,8 +402,108 @@ void Game::handleStates()
 	}
 }
 
+void Game::updateAIOptions()
+{
+	switch (lastClick)
+	{
+	//AI happy responses
+	case (1):
+		if (happyClickCount == 1)
+		{
+			AIText.setString("Great! What would you like?");
+		}
+		else if (happyClickCount == 2)
+		{
+			AIText.setString("Well thats nice of you to say");
+		}
+		else if (happyClickCount == 3)
+		{
+			AIText.setString("Please take your time...");
+		}
+		else if (happyClickCount == 4)
+		{
+			AIText.setString("You're too kind");
+		}
+		else if (happyClickCount == 5)
+		{
+			AIText.setString("Hi, I am the bartender, would you like a drink?");
+		}
+		break;
+
+	case (2):
+		if (sadClickCount == 1)
+		{
+			AIText.setString("And why is that?");
+		}
+		else if (sadClickCount == 2)
+		{
+			AIText.setString("Is something wrong?");
+		}
+		else if (sadClickCount == 3)
+		{
+			AIText.setString("Well if that's what you want...");
+		}
+		else if (sadClickCount == 4)
+		{
+			AIText.setString("I try my best with the place");
+		}
+		else if (sadClickCount == 5)
+		{
+			AIText.setString("Hi, I am the bartender, would you like a drink?");
+		}
+		break;
+
+	case (3):
+		if (angryClickCount == 1)
+		{
+			AIText.setString("That's not very nice");
+		}
+		else if (angryClickCount == 2)
+		{
+			AIText.setString("Well why don't you look at the menu");
+		}
+		else if (angryClickCount == 3)
+		{
+			AIText.setString("Everyone else seems to be enjoying themselves");
+		}
+		else if (angryClickCount == 4)
+		{
+			AIText.setString("That is none of your business");
+		}
+		else if (angryClickCount == 5)
+		{
+			AIText.setString("Hi, I am the bartender, would you like a drink?");
+		}
+		break;
+
+	case (4):
+		if (sadClickCount == 1)
+		{
+			AIText.setString("And why is that?");
+		}
+		else if (sadClickCount == 2)
+		{
+			AIText.setString("Well thats nice of you to say");
+		}
+		else if (sadClickCount == 3)
+		{
+			AIText.setString("Please take your time...");
+		}
+		else if (sadClickCount == 4)
+		{
+			AIText.setString("You're too kind");
+		}
+		else if (sadClickCount == 5)
+		{
+			AIText.setString("Hi, I am the bartender, would you like a drink?");
+		}
+		break;
+	}
+}
+
 void Game::updateHappyOptions()
 {
+	//Set happy text option based on happy meter value
 	switch (happyMeter)
 	{
 	case (0):
@@ -379,6 +534,7 @@ void Game::updateHappyOptions()
 
 void Game::updateSadOptions()
 {
+	//Set sad text option based on sad meter value
 	switch (sadMeter)
 	{
 	case (0):
@@ -409,6 +565,7 @@ void Game::updateSadOptions()
 
 void Game::updateAngryOptions()
 {
+	//Set angry text option based on angry meter value
 	switch (angryMeter)
 	{
 	case (0):
@@ -439,6 +596,7 @@ void Game::updateAngryOptions()
 
 void Game::updateExcitedOptions()
 {
+	//Set excited text option based on excited meter value
 	switch (excitedMeter)
 	{
 	case (0):
@@ -470,9 +628,11 @@ void Game::updateExcitedOptions()
 void Game::beginDraw()
 {
 	window->clear(sf::Color::Black);
+	objectivesWindow->clear(sf::Color::White);
 }
 
 void Game::endDraw()
 {
 	window->display();
+	objectivesWindow->display();
 }
