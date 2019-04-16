@@ -1,45 +1,5 @@
-﻿  Game.cpp
-c:\users\scott\documents\mat301\mat301\game.cpp(66): warning C4244: 'argument': conversion from 'T' to 'int', possible loss of data
-          with
-          [
-              T=float
-          ]
-c:\users\scott\documents\mat301\mat301\game.cpp(67): warning C4244: 'argument': conversion from 'T' to 'int', possible loss of data
-          with
-          [
-              T=float
-          ]
-c:\users\scott\documents\mat301\mat301\game.cpp(77): warning C4244: 'argument': conversion from 'T' to 'int', possible loss of data
-          with
-          [
-              T=float
-          ]
-c:\users\scott\documents\mat301\mat301\game.cpp(78): warning C4244: 'argument': conversion from 'T' to 'int', possible loss of data
-          with
-          [
-              T=float
-          ]
-c:\users\scott\documents\mat301\mat301\game.cpp(88): warning C4244: 'argument': conversion from 'T' to 'int', possible loss of data
-          with
-          [
-              T=float
-          ]
-c:\users\scott\documents\mat301\mat301\game.cpp(89): warning C4244: 'argument': conversion from 'T' to 'int', possible loss of data
-          with
-          [
-              T=float
-          ]
-c:\users\scott\documents\mat301\mat301\game.cpp(99): warning C4244: 'argument': conversion from 'T' to 'int', possible loss of data
-          with
-          [
-              T=float
-          ]
-c:\users\scott\documents\mat301\mat301\game.cpp(100): warning C4244: 'argument': conversion from 'T' to 'int', possible loss of data
-          with
-          [
-              T=float
-          ]
-c:\users\scott\documents\mat301\mat301\game.cpp(162): warning C4244: 'argument': conversion from 'T' to 'T', possible loss of data
+﻿  Game2.cpp
+c:\users\user\documents\mat301\mat301\game2.cpp(147): warning C4244: 'argument': conversion from 'T' to 'T', possible loss of data
           with
           [
               T=unsigned int
@@ -48,32 +8,4 @@ c:\users\scott\documents\mat301\mat301\game.cpp(162): warning C4244: 'argument':
           [
               T=float
           ]
-c:\users\scott\documents\mat301\mat301\game.cpp(308): warning C4244: 'argument': conversion from 'int' to 'T', possible loss of data
-          with
-          [
-              T=float
-          ]
-c:\users\scott\documents\mat301\mat301\game.cpp(309): warning C4244: 'argument': conversion from 'int' to 'T', possible loss of data
-          with
-          [
-              T=float
-          ]
-c:\users\scott\documents\mat301\mat301\game.cpp(310): warning C4244: 'argument': conversion from 'int' to 'T', possible loss of data
-          with
-          [
-              T=float
-          ]
-c:\users\scott\documents\mat301\mat301\game.cpp(311): warning C4244: 'argument': conversion from 'int' to 'T', possible loss of data
-          with
-          [
-              T=float
-          ]
-  MAT301.cpp
-c:\users\scott\documents\mat301\mat301\mat301.cpp(6): warning C4326: return type of 'main' should be 'int' instead of 'void'
-c:\users\scott\documents\mat301\mat301\mat301.cpp(32): warning C4244: 'argument': conversion from 'unsigned int' to 'T', possible loss of data
-          with
-          [
-              T=float
-          ]
-  Generating Code...
-  MAT301.vcxproj -> C:\Users\scott\Documents\MAT301\Debug\MAT301.exe
+  MAT301.vcxproj -> C:\Users\User\Documents\MAT301\Debug\MAT301.exe

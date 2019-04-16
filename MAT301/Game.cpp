@@ -2,14 +2,10 @@
 
 #include "pch.h"
 #include "Game.h"
-#include <iostream>
 
-using namespace std;
-
-Game::Game(sf::RenderWindow* hwnd, sf::RenderWindow* objhwnd, Input* in)
+Game::Game(sf::RenderWindow* hwnd, Input* in)
 {
 	window = hwnd;
-	objectivesWindow = objhwnd;
 	input = in;
 
 	if (!defaultFont.loadFromFile("font/interbureau.ttf"))
@@ -17,14 +13,13 @@ Game::Game(sf::RenderWindow* hwnd, sf::RenderWindow* objhwnd, Input* in)
 		//something went wrong
 	}
 
+	//Initialise
 	initBackAndFace();
-
 	initMeters();
-
 	initLogosAndButtons();
-
 	initText();
 
+	//Add background noise
 	audioMgr.addMusic("sfx/BarNoise.wav", "barNoise");
 }
 
@@ -63,8 +58,6 @@ void Game::handleInput(float dt)
 		input->setKeyUp(sf::Keyboard::Num1); //Set key up so it isnt held down
 		happyClickCount += 1; //Increase happy click count by 1
 		happyMeter += 10; //Increase happy meter value by 10
-		input->setMouseX(optionButton1.getPosition().x - 1); //Move mouse so doesnt stay held on button
-		input->setMouseY(optionButton1.getPosition().y - 1); //Move mouse so doesnt stay held on button
 		lastClick = 1; //Set last click to 1 to remember happy option
 	}
 
@@ -74,8 +67,6 @@ void Game::handleInput(float dt)
 		input->setKeyUp(sf::Keyboard::Num2); //Set key up so it isnt held down
 		sadMeter += 10; //Increase sad click count by 1
 		sadClickCount += 1; //Increase sad meter value by 10
-		input->setMouseX(optionButton2.getPosition().x - 1); //Move mouse so doesnt stay held on button
-		input->setMouseY(optionButton2.getPosition().y - 1); //Move mouse so doesnt stay held on button
 		lastClick = 2; //Set last click to 2 to remember sad option
 	}
 
@@ -85,8 +76,6 @@ void Game::handleInput(float dt)
 		input->setKeyUp(sf::Keyboard::Num3); //Set key up so it isnt held down
 		angryMeter += 10; //Increase angry click count by 1
 		angryClickCount += 1; //Increase angry meter value by 10
-		input->setMouseX(optionButton3.getPosition().x - 1); //Move mouse so doesnt stay held on button
-		input->setMouseY(optionButton3.getPosition().y - 1); //Move mouse so doesnt stay held on button
 		lastClick = 3; //Set last click to 3 to remember angry option
 	}
 
@@ -96,8 +85,6 @@ void Game::handleInput(float dt)
 		input->setKeyUp(sf::Keyboard::Num4); //Set key up so it isnt held down
 		excitedMeter += 10; //Increase excited click count by 1
 		excitedClickCount += 1; //Increase excited meter value by 10
-		input->setMouseX(optionButton4.getPosition().x - 1); //Move mouse so doesnt stay held on button
-		input->setMouseY(optionButton4.getPosition().y - 1); //Move mouse so doesnt stay held on button
 		lastClick = 4; //Set last click to 4 to remember excited option
 	}
 }
@@ -130,6 +117,10 @@ void Game::render()
 	window->draw(sadLogo);
 	window->draw(angryLogo);
 	window->draw(excitedLogo);
+	window->draw(happyNum);
+	window->draw(sadNum);
+	window->draw(angryNum);
+	window->draw(excitedNum);
 
 	//Draw text boxes
 	window->draw(AITextBox);
@@ -146,10 +137,6 @@ void Game::render()
 	window->draw(textOption4);
 	window->draw(AIMoodText1);
 	window->draw(AIMoodText2);
-
-	////////Objectives Window/////////
-
-	objectivesWindow->draw(objTitle);
 
 	endDraw();
 }
@@ -265,7 +252,7 @@ void Game::initText()
 	textOption1.setFillColor(sf::Color::Black);
 	textOption1.setPosition(optionButton1.getPosition().x + 20, optionButton1.getPosition().y + 15);
 
-	textOption2.setString("No not really");
+	textOption2.setString("I am really sad today");
 	textOption2.setFont(defaultFont);
 	textOption2.setCharacterSize(25);
 	textOption2.setFillColor(sf::Color::Black);
@@ -295,11 +282,29 @@ void Game::initText()
 	AIMoodText2.setFillColor(sf::Color::Black);
 	AIMoodText2.setPosition(375, 23);
 
-	objTitle.setString("Objectives");
-	objTitle.setFont(defaultFont);
-	objTitle.setCharacterSize(75);
-	objTitle.setFillColor(sf::Color::Black);
-	objTitle.setPosition(250, -20);
+	happyNum.setString("1");
+	happyNum.setFont(defaultFont);
+	happyNum.setCharacterSize(35);
+	happyNum.setFillColor(sf::Color::Black);
+	happyNum.setPosition(happyLogo.getPosition().x + 15, happyLogo.getPosition().y - 5);
+
+	sadNum.setString("2");
+	sadNum.setFont(defaultFont);
+	sadNum.setCharacterSize(35);
+	sadNum.setFillColor(sf::Color::Black);
+	sadNum.setPosition(sadLogo.getPosition().x + 15, sadLogo.getPosition().y - 5);
+
+	angryNum.setString("3");
+	angryNum.setFont(defaultFont);
+	angryNum.setCharacterSize(35);
+	angryNum.setFillColor(sf::Color::Black);
+	angryNum.setPosition(angryLogo.getPosition().x + 15, angryLogo.getPosition().y - 5);
+
+	excitedNum.setString("4");
+	excitedNum.setFont(defaultFont);
+	excitedNum.setCharacterSize(35);
+	excitedNum.setFillColor(sf::Color::Black);
+	excitedNum.setPosition(excitedLogo.getPosition().x + 15, excitedLogo.getPosition().y - 5);
 }
 
 void Game::handleMeters()
@@ -309,6 +314,36 @@ void Game::handleMeters()
 	sadMeterRec.setSize(sf::Vector2f(20, sadMeter));
 	angryMeterRec.setSize(sf::Vector2f(20, angryMeter));
 	excitedMeterRec.setSize(sf::Vector2f(20, excitedMeter));
+
+	//Update equal meter values
+	if ((happyMeter == sadMeter) || (happyMeter == angryMeter) || (happyMeter == excitedMeter))
+	{
+		if (lastClick == 1)
+		{
+			state = States::HAPPY;
+		}
+	}
+	if ((sadMeter == happyMeter) || (sadMeter == angryMeter) || (sadMeter == excitedMeter))
+	{
+		if (lastClick == 2)
+		{
+			state = States::SAD;
+		}
+	}
+	if ((angryMeter == happyMeter) || (angryMeter == sadMeter) || (angryMeter == excitedMeter))
+	{
+		if (lastClick == 3)
+		{
+			state = States::ANGRY;
+		}
+	}
+	if ((excitedMeter == happyMeter) || (excitedMeter == sadMeter) || (excitedMeter == angryMeter))
+	{
+		if (lastClick == 4)
+		{
+			state = States::EXCITED;
+		}
+	}
 
 	//Dont allow emotion meters to exceed 50, reset meters if any reach 50 and set state to neutral
 	if (happyMeter >= 50 || sadMeter >= 50 || angryMeter >= 50 || excitedMeter >= 50)
@@ -538,7 +573,7 @@ void Game::updateSadOptions()
 	switch (sadMeter)
 	{
 	case (0):
-		textOption2.setString("No not really");
+		textOption2.setString("I am really sad today");
 		break;
 
 	case (10):
@@ -628,11 +663,9 @@ void Game::updateExcitedOptions()
 void Game::beginDraw()
 {
 	window->clear(sf::Color::Black);
-	objectivesWindow->clear(sf::Color::White);
 }
 
 void Game::endDraw()
 {
 	window->display();
-	objectivesWindow->display();
 }

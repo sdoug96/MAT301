@@ -6,13 +6,16 @@
 #include "GameObject.h"
 #include "Input.h"
 #include "AudioManager.h"
+#include <iostream>
+
+using namespace std;
 
 class Game 
 {
 
 public:
 
-	Game(sf::RenderWindow* hwnd, sf::RenderWindow* objhwnd, Input* in);
+	Game(sf::RenderWindow* hwnd, Input* in);
 	~Game();
 
 	void update(float dt);
@@ -80,32 +83,22 @@ private:
 	sf::Texture bodyTexture; //Body texture
 	sf::Texture neutralFaceTex; //Neutral expression texture
 	sf::Texture happyFaceTex; //Happy expression texture
-	sf::Texture sadFaceTex; //Happy expression texture
-	sf::Texture angryFaceTex; //Happy expression texture
-	sf::Texture excitedFaceTex; //Happy expression texture
+	sf::Texture sadFaceTex; //Sad expression texture
+	sf::Texture angryFaceTex; //Angry expression texture
+	sf::Texture excitedFaceTex; //Excited expression texture
 	sf::Texture textBoxTex; //Text box texture
 
 	sf::Font defaultFont; //Font game object
 
 	sf::Text AIText; //AI text game object
-	sf::Text AIMoodText1; //AI mood text game objects
-	sf::Text AIMoodText2; 
+	sf::Text AIMoodText1, AIMoodText2; //AI mood text game objects
 	sf::Text textOption1, textOption2, textOption3, textOption4; //Text option game objects
+	sf::Text happyNum, sadNum, angryNum, excitedNum; //Number indicator text objects
 
 	sf::RectangleShape happyMeterBack, sadMeterBack, angryMeterBack, excitedMeterBack; //Meter background game objects
 
 	sf::RectangleShape happyMeterRec, sadMeterRec, angryMeterRec, excitedMeterRec; //Meter game objects
 
 	sf::CircleShape happyLogo, sadLogo, angryLogo, excitedLogo; //Indicator game objects
-
-
-	////////////////Objectives Window Stuff////////////////////////////////
-
-	sf::Text objTitle; //Objective window title
-
-	sf::Text obj1, obj2, obj3, obj4; //Objective window objectives text
-
-	GameObject checkbox1, checkbox2, checkbox3, checkbox4; //Objective window checkboxes
-	GameObject tick1, tick2, tick3, tick4; //Objective window ticks
 };
 
