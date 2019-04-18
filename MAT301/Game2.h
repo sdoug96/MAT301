@@ -8,6 +8,7 @@
 #include "Input.h"
 #include "AudioManager.h"
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
@@ -38,6 +39,11 @@ private:
 	//Update main game text options
 	void updateAIOptions();
 
+	void AIHappy();
+	void AISad();
+	void AIAngry();
+	void AIExcited();
+
 	void updateHappyOptions();
 	void updateSadOptions();
 	void updateAngryOptions();
@@ -54,6 +60,11 @@ private:
 	GameObject rewardButton, punishButton; //Reward and punish button game objects
 
 	int lastClick; //Last click to remember which option was selected last (1 = happy, 2 = sad, 3 = angry, 4 = excited)
+
+	//Vectors holding values for AI to determine whether his last response was good or bad
+	vector<int> userResponse;
+	vector<int> AIResponse;
+	vector<char> rewardOrPunish;
 
 	AudioManager audioMgr; //Manages game audio
 	bool hasStarted;
@@ -78,8 +89,6 @@ private:
 
 	sf::CircleShape happyLogo, sadLogo, angryLogo, excitedLogo, rewardLogo, punishLogo; //Indicator game objects
 
-	int rewardValue; //AIs current reward value
-	std::string rewardValString; //AIs current reward value to string
 	std::string rewardVal; //Reward value in string form, reward or punish for AI to remember
 };
 

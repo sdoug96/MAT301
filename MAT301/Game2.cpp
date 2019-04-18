@@ -14,8 +14,6 @@ Game2::Game2(sf::RenderWindow* hwnd, Input* in)
 	}
 
 	//Initialise
-	rewardValue = 0;
-	rewardValString = "0";
 	rewardVal = "";
 	initBackAndFace();
 	initLogosAndButtons();
@@ -38,11 +36,8 @@ void Game2::update(float dt)
 		hasStarted = true;
 	}
 
-	//Convert reward value int to string
-	rewardValString = to_string(rewardValue);
-
 	//Update text to converted int value
-	AIRewardValText2.setString(rewardValString);
+	AIRewardValText2.setString(rewardVal);
 }
 
 void Game2::handleInput(float dt)
@@ -50,51 +45,59 @@ void Game2::handleInput(float dt)
 	if (input->isKeyDown(sf::Keyboard::R))
 	{
 		input->setKeyUp(sf::Keyboard::R);
-		rewardValue += 10;
 		rewardVal = "reward";
+		rewardOrPunish.push_back('r'); //AI remembers that it was rewarded for its last response
 	}
 
 	if (input->isKeyDown(sf::Keyboard::P))
 	{
 		input->setKeyUp(sf::Keyboard::P);
-		rewardValue -= 10;
 		rewardVal = "punish";
+		rewardOrPunish.push_back('p'); //AI remembers that it was punished for its last response
 	}
 
 	//Option 1 (happy option) is chosen
 	if (input->isKeyDown(sf::Keyboard::Num1))
 	{
 		input->setKeyUp(sf::Keyboard::Num1); //Set key up so it isnt held down
+		lastClick = 1; //Set last click to 1 to remember happy option
+		userResponse.push_back(1); //AI remembers users last response as happy (or 1)
 		updateHappyOptions(); //Update users responses
 		updateAIOptions(); //Update AIs response
-		lastClick = 1; //Update most recent user response
+
 	}
 
 	//Option 2 (sad option) is chosen
 	if (input->isKeyDown(sf::Keyboard::Num2))
 	{
 		input->setKeyUp(sf::Keyboard::Num2); //Set key up so it isnt held down
+		lastClick = 2; //Set last click to 2 to remember sad option
+		userResponse.push_back(2); //AI remembers users last response as sad (or 2)
 		updateSadOptions(); //Update users responses
 		updateAIOptions(); //Update AIs response
-		lastClick = 2; //Update most recent user response
+
 	}
 
 	//Option 3 (angry option) is chosen
 	if (input->isKeyDown(sf::Keyboard::Num3))
 	{
 		input->setKeyUp(sf::Keyboard::Num3); //Set key up so it isnt held down
+		lastClick = 3; //Set last click to 3 to remember angry option
+		userResponse.push_back(3); //AI remembers users last response as angry (or 3)
 		updateAngryOptions(); //Update users responses
 		updateAIOptions(); //Update AIs response
-		lastClick = 3; //Update most recent user response
+
 	}
 
 	//Option 4 (excited option) is chosen
 	if (input->isKeyDown(sf::Keyboard::Num4))
 	{
 		input->setKeyUp(sf::Keyboard::Num4); //Set key up so it isnt held down
+		lastClick = 4; //Set last click to 4 to remember excited option
+		userResponse.push_back(4); //AI remembers users last response as excited (or 4)
 		updateExcitedOptions(); //Update users responses
 		updateAIOptions(); //Update AIs response
-		lastClick = 4; //Update most recent user response
+
 	}
 }
 
@@ -284,17 +287,17 @@ void Game2::initText()
 	AIMoodText2.setFillColor(sf::Color::Black);
 	AIMoodText2.setPosition(375, 23);
 
-	AIRewardValText1.setString("Current Reward Value: ");
+	AIRewardValText1.setString("Last Reward: ");
 	AIRewardValText1.setFont(defaultFont);
 	AIRewardValText1.setCharacterSize(50);
 	AIRewardValText1.setFillColor(sf::Color::Black);
 	AIRewardValText1.setPosition(1350, 850);
 
-	AIRewardValText2.setString("0");
+	AIRewardValText2.setString("");
 	AIRewardValText2.setFont(defaultFont);
 	AIRewardValText2.setCharacterSize(50);
 	AIRewardValText2.setFillColor(sf::Color::Black);
-	AIRewardValText2.setPosition(1800, 850);
+	AIRewardValText2.setPosition(1600, 850);
 
 	happyNum.setString("1");
 	happyNum.setFont(defaultFont);
@@ -336,41 +339,118 @@ void Game2::initText()
 void Game2::updateAIOptions()
 {
 	int random = rand() % 4;
+	int selectedResponse;
 
-	switch (random)
+	//If AI hasnt given a response yet, it will choose a random response (as it has no data to go by yet)
+	if (AIResponse.size() == 0)
 	{
-	case (0):
-		AIText.setString("Thats really nice of you!");
-		AIMoodText2.setString("Happy");
-		AIMoodText1.setFillColor(sf::Color::Green);
-		AIMoodText2.setFillColor(sf::Color::Green);
-		face.setTexture(&happyFaceTex);
-		break;
+		switch (random)
+		{
+		case (0):
+			AIHappy();
+			break;
 
-	case (1):
-		AIText.setString("Thats so sad");
-		AIMoodText2.setString("Sad");
-		AIMoodText1.setFillColor(sf::Color::Blue);
-		AIMoodText2.setFillColor(sf::Color::Blue);
-		face.setTexture(&sadFaceTex);
-		break;
+		case (1):
+			AISad();
+			break;
 
-	case (2):
-		AIText.setString("You are making me angry");
-		AIMoodText2.setString("Angry");
-		AIMoodText1.setFillColor(sf::Color::Red);
-		AIMoodText2.setFillColor(sf::Color::Red);
-		face.setTexture(&angryFaceTex);
-		break;
+		case (2):
+			AIAngry();
+			break;
 
-	case (3):
-		AIText.setString("Really?!");
-		AIMoodText2.setString("Excited");
-		AIMoodText1.setFillColor(sf::Color::Yellow);
-		AIMoodText2.setFillColor(sf::Color::Yellow);
-		face.setTexture(&excitedFaceTex);
-		break;
+		case (3):
+			AIExcited();
+			break;
+		}
 	}
+	else
+	{
+		//Loop through AI responses that have been rewarded or punished
+		for (int i = 0; i < rewardOrPunish.size(); i++)
+		{
+			//If the user response for that AI response is equal to the last user response given
+			if (userResponse[i] == lastClick)
+			{
+				//If the AI was rewarded for that response
+				if (rewardOrPunish[i] == 'r')
+				{
+					//Give that reponse again and exit loop
+					selectedResponse = AIResponse[i - 1];
+					cout << "Hello" << endl;
+					break;
+				}
+				else
+				{
+					selectedResponse = random;
+					cout << "Hi" << endl;
+				}
+			}
+			else
+			{
+				selectedResponse = random;
+			}
+		}
+
+		//Give the selected response
+		switch (selectedResponse)
+		{
+		case (0):
+			AIHappy();
+			break;
+
+		case (1):
+			AISad();
+			break;
+
+		case (2):
+			AIAngry();
+			break;
+
+		case (3):
+			AIExcited();
+			break;
+		}
+	}
+}
+
+void Game2::AIHappy()
+{
+	AIResponse.push_back(1); //AI remembers its last response as happy(or 1)
+	AIText.setString("Thats really nice of you!");
+	AIMoodText2.setString("Happy");
+	AIMoodText1.setFillColor(sf::Color::Green);
+	AIMoodText2.setFillColor(sf::Color::Green);
+	face.setTexture(&happyFaceTex);
+}
+
+void Game2::AISad()
+{
+	AIResponse.push_back(2); //AI remembers its last response as sad(or 2)
+	AIText.setString("Thats so sad");
+	AIMoodText2.setString("Sad");
+	AIMoodText1.setFillColor(sf::Color::Blue);
+	AIMoodText2.setFillColor(sf::Color::Blue);
+	face.setTexture(&sadFaceTex);
+}
+
+void Game2::AIAngry()
+{
+	AIResponse.push_back(3); //AI remembers its last response as angry(or 3)
+	AIText.setString("You are making me angry");
+	AIMoodText2.setString("Angry");
+	AIMoodText1.setFillColor(sf::Color::Red);
+	AIMoodText2.setFillColor(sf::Color::Red);
+	face.setTexture(&angryFaceTex);
+}
+
+void Game2::AIExcited()
+{
+	AIResponse.push_back(4); //AI remembers its last response as excited(or 4)
+	AIText.setString("Really?!");
+	AIMoodText2.setString("Excited");
+	AIMoodText1.setFillColor(sf::Color::Yellow);
+	AIMoodText2.setFillColor(sf::Color::Yellow);
+	face.setTexture(&excitedFaceTex);
 }
 
 void Game2::updateHappyOptions()
