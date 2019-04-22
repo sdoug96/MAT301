@@ -61,7 +61,7 @@ private:
 
 	int lastClick; //Last click to remember which option was selected last (1 = happy, 2 = sad, 3 = angry, 4 = excited)
 
-	//Vectors holding values for AI to determine whether his last response was good or bad
+	//Vectors holding values for AI to determine whether his responses were good or bad
 	vector<int> userResponse;
 	vector<int> AIResponse;
 	vector<char> rewardOrPunish;
@@ -86,9 +86,12 @@ private:
 	sf::Text textOption1, textOption2, textOption3, textOption4; //Text option game objects
 	sf::Text happyNum, sadNum, angryNum, excitedNum, rewardLet, punishLet; //Number and letter indicator text game objects
 	sf::Text rewardText, punishText; //Reward and punish text game objects
+	sf::Text instructText1, instructText2; //Reward and punish text game objects
 
 	sf::CircleShape happyLogo, sadLogo, angryLogo, excitedLogo, rewardLogo, punishLogo; //Indicator game objects
 
 	std::string rewardVal; //Reward value in string form, reward or punish for AI to remember
+
+	bool responding = true, rewarding = false; //Booleans so the user has to respond and reward/punish at the correct time
 };
 
