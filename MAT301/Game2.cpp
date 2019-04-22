@@ -348,18 +348,25 @@ void Game2::updateAIOptions()
 		{
 		case (0):
 			AIHappy();
+			cout << "Happy" << endl;
 			break;
 
 		case (1):
 			AISad();
+			cout << "Sad" << endl;
 			break;
 
 		case (2):
 			AIAngry();
+			cout << "Angry" << endl;
 			break;
 
 		case (3):
 			AIExcited();
+			cout << "Excited" << endl;
+			break;
+
+		default:
 			break;
 		}
 	}
@@ -375,14 +382,11 @@ void Game2::updateAIOptions()
 				if (rewardOrPunish[i] == 'r')
 				{
 					//Give that reponse again and exit loop
-					selectedResponse = AIResponse[i - 1];
-					cout << "Hello" << endl;
-					break;
+					selectedResponse = AIResponse[i] - 1;
 				}
 				else
 				{
 					selectedResponse = random;
-					cout << "Hi" << endl;
 				}
 			}
 			else
@@ -396,18 +400,25 @@ void Game2::updateAIOptions()
 		{
 		case (0):
 			AIHappy();
+			cout << "Happy" << endl;
 			break;
 
 		case (1):
 			AISad();
+			cout << "Sad" << endl;
 			break;
 
 		case (2):
 			AIAngry();
+			cout << "Angry" << endl;
 			break;
 
 		case (3):
 			AIExcited();
+			cout << "Excited" << endl;
+			break;
+
+		default:
 			break;
 		}
 	}
